@@ -16,7 +16,7 @@ result** — the table the model, Genie, and the app all consume. This is the he
 (`read_files`/Auto Loader streaming tables). **silver** = conformed, typed, deduped line items +
 governed `vendor_master` and `match_config`. **gold** = `invoice_match_result` (materialized view):
 one row per invoice line with disposition (`AUTO_APPROVED` | `HOLD`), per-field match flags,
-exception reason code(s), discrepancy features, and `$_at_risk`.
+exception reason code(s), discrepancy features, and `amt_at_risk`.
 
 **Tech stack:** Lakeflow SDP (streaming tables + materialized views), Auto Loader (`read_files`),
 Unity Catalog, Delta, SQL/PySpark, serverless.
@@ -79,7 +79,7 @@ SELECT count(*) FROM febar_accord_dev.bronze_dev.bronze_invoice_raw WHERE _rescu
 **Interfaces:**
 - Consumes: bronze tables + `vendor_master` (from foundation).
 - Produces: silver materialized views `silver_po_line`, `silver_gr_line`, `silver_invoice_line`,
-  plus governed `silver_vendor_master` and `silver_match_config`.
+  plus governed `vendor_master` and `match_config`.
 
 **Approach:**
 - [ ] Type/cast keys (`po_id`, `product_no`, `qty_*`, `unit_price`, dates); enforce a light
@@ -88,7 +88,7 @@ SELECT count(*) FROM febar_accord_dev.bronze_dev.bronze_invoice_raw WHERE _rescu
       `DUP_INVOICE` signal in P3).
 - [ ] **Normalize** vendor name/address (trim/upper/collapse whitespace; strip punctuation) and
       **UOM** (map synonyms → canonical) — enables reliable matching in P3.
-- [ ] Seed `silver_match_config`: `price_tol_pct`, `qty_tol_units`, `immaterial_amt` — governed so
+- [ ] Seed `match_config`: `price_tol_pct`, `qty_tol_units`, `immaterial_amt` — governed so
       the demo can retune tolerances live.
 
 **Databricks Assistant prompt (generate, then own):**
@@ -97,7 +97,7 @@ Write SDP silver transforms: from bronze_po_raw/bronze_gr_raw/bronze_invoice_raw
 materialized views silver_po_line, silver_gr_line, silver_invoice_line with proper types, non-null
 key expectations, and dedup of invoice lines on (vendor_id, invoice_no, inv_line_no) preserving a
 dup_seq. Add UOM normalization (map synonyms to a canonical uom) and vendor name/address
-normalization (trim, upper, collapse whitespace). Also emit silver_match_config with price_tol_pct,
+normalization (trim, upper, collapse whitespace). Also emit match_config with price_tol_pct,
 qty_tol_units, immaterial_amt.
 ```
 
@@ -116,7 +116,7 @@ SELECT DISTINCT uom FROM febar_accord_dev.silver_dev.silver_invoice_line; -- can
 - Add to: `pipeline/resources/accord_pipeline.pipeline.yml`
 
 **Interfaces:**
-- Consumes: silver line tables + `silver_match_config` + `silver_vendor_master`.
+- Consumes: silver line tables + `match_config` + `vendor_master`.
 - Produces: gold materialized view **`invoice_match_result`** — one row per invoice line.
 
 **`invoice_match_result` columns (contract for ML/Genie/App):**
@@ -141,7 +141,7 @@ SELECT DISTINCT uom FROM febar_accord_dev.silver_dev.silver_invoice_line; -- can
 ```
 Write an SDP gold transform invoice_match_result: for each silver_invoice_line, LEFT JOIN
 silver_po_line on (po_id, product_no) and LEFT JOIN aggregated silver_gr_line on (po_id,
-product_no). Using silver_match_config tolerances, compute price_match (abs(inv-po)/po <=
+product_no). Using match_config tolerances, compute price_match (abs(inv-po)/po <=
 price_tol_pct), qty_match (qty_billed <= qty_received + qty_tol_units), vendor_match (remit-to vs
 vendor_master, normalized), uom_match, receipt_present, po_present, is_duplicate (dup_seq>1). Derive
 features price_var_pct, qty_var_units, receipt_lag_days, days_since_po, invoice_amount, amt_at_risk.

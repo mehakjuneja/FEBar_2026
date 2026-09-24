@@ -83,7 +83,7 @@ match_config, vendor_master (seed)                                             â
   `vendor_master` and `match_config`. Deduped, typed, standardized (vendor name/address
   normalization, UOM normalization).
 - **gold** â€” `invoice_match_result` (one row per invoice line: match status, per-field flags,
-  discrepancy features, `$_at_risk`) and feature/label tables for ML.
+  discrepancy features, `amt_at_risk`) and feature/label tables for ML.
 
 ## 4. Canonical naming (do not drift)
 

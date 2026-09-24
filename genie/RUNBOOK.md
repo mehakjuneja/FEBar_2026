@@ -13,7 +13,7 @@
 **Skills:** databricks-core → databricks-genie-agents (and/or databricks-data-discovery),
 databricks-unity-catalog.
 
-**Scope:** `gold_dev.invoice_match_result` + `silver_dev.silver_vendor_master`.
+**Scope:** `gold_dev.invoice_match_result` + `silver_dev.vendor_master`.
 
 **Verify:** the 8 benchmark NL questions return answers matching the SQL on gold (target ≥ 7/8); SQL
 is visible; synonyms (hold=exception, supplier=vendor) work.

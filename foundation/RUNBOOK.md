@@ -15,4 +15,4 @@ fe-databricks-tools:databricks-data-generation), databricks-dabs.
 **Run:** `databricks bundle run foundation_job -t dev --profile <name>`
 
 **Verify:** `line_truth` disposition mix ≈ 70% MATCH_OK; feeds present under
-`/Volumes/febar_accord_dev/landing_dev/feeds/`. See the plan's Verify blocks.
+`/Volumes/accord_febar_catalog/landing/feeds/`. See the plan's Verify blocks.

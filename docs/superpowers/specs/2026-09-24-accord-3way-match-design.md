@@ -90,7 +90,7 @@ match_config, vendor_master (seed)                                             â
 | Thing | Value |
 |---|---|
 | Codename | **Accord** |
-| Catalog (dev / prod) | `febar_accord_dev` / `febar_accord` (via bundle var `catalog`) |
+| Catalog (dev / prod) | `accord_febar_catalog` / `febar_accord` (via bundle var `catalog`) |
 | Schemas | `landing`, `bronze`, `silver`, `gold`, `ml` (suffix `_dev` in dev, none in prod) |
 | Volume (landing) | `/Volumes/${catalog}/landing${suffix}/feeds/{po,gr,invoice}/` |
 | Match result table | `${catalog}.gold${suffix}.invoice_match_result` |

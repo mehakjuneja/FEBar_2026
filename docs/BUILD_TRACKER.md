@@ -11,7 +11,9 @@ when an object lands: flip its status here (and check the box in its phase plan)
 **Verified means:** it ran, and I checked the output against an explicit expectation (row counts,
 endpoint responds, Genie answers correctly, app renders + writes an audit row).
 
-**Last updated:** 2026-09-24 — scaffold + plans created. **Build not started (all ⬜).**
+**Last updated:** 2026-09-24 — scaffold + plans created; **F1 built & verified** in the FEVM
+`accord-febar` workspace (catalog `accord_febar_catalog`; schemas landing/bronze/silver/gold/ml;
+volume `landing.feeds` with po/gr/invoice). Next: F2.
 
 ---
 
@@ -33,7 +35,7 @@ endpoint responds, Genie answers correctly, app renders + writes an audit row).
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| F1 | UC setup (catalog/schemas/volume/grants) | ⬜ | schemas + volume exist | `foundation/src/00_uc_setup.py` |
+| F1 | UC setup (catalog/schemas/volume/grants) | ✅ | schemas + volume + feed folders verified | `foundation/src/00_uc_setup.py` |
 | F2 | Synthetic PO/GR/Invoice generator (+ seeded labeled discrepancies) | ⬜ | row counts + disposition mix | ground truth for ML |
 | F3 | Landing feeds written to volume | ⬜ | files present under `/feeds/{po,gr,invoice}` | CSV/JSON |
 

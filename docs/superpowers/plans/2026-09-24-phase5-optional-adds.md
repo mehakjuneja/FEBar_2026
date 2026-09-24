@@ -26,7 +26,7 @@ requirement and the strongest "AI Mindset" signal.
 
 **Files:** `dashboard/src/accord_exceptions.lvdash.json`, `dashboard/resources/accord_dashboard.dashboard.yml`.
 
-**Interfaces:** consumes `gold_dev.invoice_match_result` (+ audit for rejected).
+**Interfaces:** consumes `gold.invoice_match_result` (+ audit for rejected).
 
 **Approach / widgets:**
 - [ ] KPIs: touchless (auto-approve) match rate; total $ on hold; # open exceptions.
@@ -36,7 +36,7 @@ requirement and the strongest "AI Mindset" signal.
 
 **Databricks Assistant / Designer prompt:**
 ```
-Create an AI/BI dashboard over gold_dev.invoice_match_result: KPI tiles for auto-approve rate, total
+Create an AI/BI dashboard over gold.invoice_match_result: KPI tiles for auto-approve rate, total
 $ at risk, open exception count; bar of holds by reason_code; top-10 suppliers by exception rate;
 line of $ at risk by month; a disposition trend with a week/month/year granularity control.
 ```

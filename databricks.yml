@@ -7,32 +7,33 @@ bundle:
   name: accord
 
 # Per-module resource definitions are added under each module's resources/ folder as phases land.
+# Uncomment each include as that module's first resource yml is created (keeps `validate` green).
 include:
   - foundation/resources/*.yml
-  - pipeline/resources/*.yml
-  - ml/resources/*.yml
-  - app/resources/*.yml
-  - dashboard/resources/*.yml
-  - agents/resources/*.yml
+  # - pipeline/resources/*.yml
+  # - ml/resources/*.yml
+  # - app/resources/*.yml
+  # - dashboard/resources/*.yml
+  # - agents/resources/*.yml
 
 # Bundle variables — notebooks/resources read these; NO hardcoded catalog/host literals.
 variables:
   catalog:
     description: Unity Catalog for this target.
-    default: febar_accord_dev
+    default: accord_febar_catalog
   schema_suffix:
-    description: Schema suffix (e.g. _dev in dev, empty in prod).
-    default: _dev
+    description: Schema suffix (empty in the accord-febar workspace; use _dev if you add a dev/prod split).
+    default: ""
 
 targets:
   dev:
     mode: development
     default: true
-    # workspace:
-    #   host: https://<your-dev-workspace>.cloud.databricks.com
+    workspace:
+      host: https://fevm-accord-febar.cloud.databricks.com
     variables:
-      catalog: febar_accord_dev
-      schema_suffix: _dev
+      catalog: accord_febar_catalog
+      schema_suffix: ""
 
   prod:
     mode: production

@@ -63,8 +63,8 @@ _rescued_data. Output row counts per table.
 
 **Verify:**
 ```sql
-SELECT count(*) FROM febar_accord_dev.bronze_dev.bronze_invoice_raw;  -- = invoice feed rows
-SELECT count(*) FROM febar_accord_dev.bronze_dev.bronze_invoice_raw WHERE _rescued_data IS NOT NULL; -- small % (seeded malformed)
+SELECT count(*) FROM accord_febar_catalog.bronze.bronze_invoice_raw;  -- = invoice feed rows
+SELECT count(*) FROM accord_febar_catalog.bronze.bronze_invoice_raw WHERE _rescued_data IS NOT NULL; -- small % (seeded malformed)
 ```
 
 ---
@@ -103,8 +103,8 @@ qty_tol_units, immaterial_amt.
 
 **Verify:**
 ```sql
-SELECT count(*), count(DISTINCT (vendor_id, invoice_no, inv_line_no)) FROM febar_accord_dev.silver_dev.silver_invoice_line; -- equal after dedup
-SELECT DISTINCT uom FROM febar_accord_dev.silver_dev.silver_invoice_line; -- canonical set only
+SELECT count(*), count(DISTINCT (vendor_id, invoice_no, inv_line_no)) FROM accord_febar_catalog.silver.silver_invoice_line; -- equal after dedup
+SELECT DISTINCT uom FROM accord_febar_catalog.silver.silver_invoice_line; -- canonical set only
 ```
 
 ---
@@ -153,13 +153,13 @@ UOM_MISMATCH} and a reason_detail listing all failed asserts.
 **Verify (functional + reconciliation against ground truth):**
 ```sql
 -- disposition mix
-SELECT disposition, count(*), round(sum(amt_at_risk),2) amt FROM febar_accord_dev.gold_dev.invoice_match_result GROUP BY 1;
+SELECT disposition, count(*), round(sum(amt_at_risk),2) amt FROM accord_febar_catalog.gold.invoice_match_result GROUP BY 1;
 -- reason breakdown
-SELECT reason_code, count(*) FROM febar_accord_dev.gold_dev.invoice_match_result WHERE disposition='HOLD' GROUP BY 1 ORDER BY 2 DESC;
+SELECT reason_code, count(*) FROM accord_febar_catalog.gold.invoice_match_result WHERE disposition='HOLD' GROUP BY 1 ORDER BY 2 DESC;
 -- MATCH ACCURACY vs seeded ground truth (foundation line_truth): should agree on the large majority
 SELECT (r.disposition='HOLD') AS pred_hold, (t.true_disposition='HOLD') AS true_hold, count(*)
-FROM febar_accord_dev.gold_dev.invoice_match_result r
-JOIN febar_accord_dev.landing_dev.line_truth t USING (invoice_id, inv_line_no)
+FROM accord_febar_catalog.gold.invoice_match_result r
+JOIN accord_febar_catalog.landing.line_truth t USING (invoice_id, inv_line_no)
 GROUP BY 1,2;  -- inspect off-diagonal: those are the interesting edge cases (great roleplay material)
 ```
 

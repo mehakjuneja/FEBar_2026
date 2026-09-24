@@ -33,7 +33,7 @@ serverless notebooks; DAB.
 - **Profile:** operator-chosen; pass `--profile <name>`. **Never auto-select.**
 - **Serverless** compute unless stated.
 - **Seed the RNG** so regeneration is reproducible and the disposition mix is stable.
-- **Naming** per spec §4: catalog `febar_accord_dev`, schemas `landing_dev`/`bronze_dev`/…,
+- **Naming** per spec §4: catalog `accord_febar_catalog`, schemas `landing`/`bronze`/…,
   volume `/Volumes/${catalog}/landing${suffix}/feeds/`.
 
 ---
@@ -60,7 +60,7 @@ serverless notebooks; DAB.
 **Databricks Assistant prompt (generate, then review & own):**
 ```
 Write a Databricks notebook that sets up Unity Catalog for a project. Read widgets "catalog"
-(default febar_accord_dev) and "schema_suffix" (default _dev). Create the catalog if not exists,
+(default accord_febar_catalog) and "schema_suffix" (default _dev). Create the catalog if not exists,
 then schemas landing<suffix>, bronze<suffix>, silver<suffix>, gold<suffix>, ml<suffix>. Create a
 managed volume named landing<suffix> and, using dbutils.fs.mkdirs, create subdirectories
 feeds/po, feeds/gr, feeds/invoice under the volume. Print each object created. Idempotent.
@@ -68,8 +68,8 @@ feeds/po, feeds/gr, feeds/invoice under the volume. Print each object created. I
 
 **Verify:**
 ```sql
-SHOW SCHEMAS IN febar_accord_dev;              -- expect landing_dev, bronze_dev, silver_dev, gold_dev, ml_dev
-LIST '/Volumes/febar_accord_dev/landing_dev/feeds';  -- expect po/ gr/ invoice/
+SHOW SCHEMAS IN accord_febar_catalog;              -- expect landing, bronze, silver, gold, ml
+LIST '/Volumes/accord_febar_catalog/landing/feeds';  -- expect po/ gr/ invoice/
 ```
 
 ---
@@ -124,10 +124,10 @@ Print row counts per table and the disposition/reason distribution. Everything m
 
 **Verify:**
 ```sql
-SELECT true_reason, count(*) FROM febar_accord_dev.landing_dev.line_truth GROUP BY 1 ORDER BY 2 DESC;
+SELECT true_reason, count(*) FROM accord_febar_catalog.landing.line_truth GROUP BY 1 ORDER BY 2 DESC;
 -- expect ~70% MATCH_OK, the rest spread across the taxonomy; rates differ by vendor
-SELECT count(DISTINCT vendor_id) FROM febar_accord_dev.landing_dev.vendor_master;  -- ~25
-SELECT count(*) FROM febar_accord_dev.landing_dev.invoice_line;                    -- tens of thousands
+SELECT count(DISTINCT vendor_id) FROM accord_febar_catalog.landing.vendor_master;  -- ~25
+SELECT count(*) FROM accord_febar_catalog.landing.invoice_line;                    -- tens of thousands
 ```
 
 ---
@@ -154,7 +154,7 @@ files under feeds/invoice. Partition file names by year-month. Print the files w
 
 **Verify:**
 ```bash
-databricks fs ls /Volumes/febar_accord_dev/landing_dev/feeds/invoice --profile <name>
+databricks fs ls /Volumes/accord_febar_catalog/landing/feeds/invoice --profile <name>
 # expect multiple monthly JSON files
 ```
 

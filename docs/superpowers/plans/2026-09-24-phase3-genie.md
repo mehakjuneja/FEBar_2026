@@ -39,7 +39,7 @@ test.
 - Optionally: `genie/src/accord_genie_space.geniespace.json` if exporting/versioning the space.
 
 **Interfaces:**
-- Consumes: `gold_dev.invoice_match_result`, `silver_dev.vendor_master` (+ dims).
+- Consumes: `gold.invoice_match_result`, `silver.vendor_master` (+ dims).
 - Produces: a live Genie space + a versioned config + benchmark set.
 
 **Approach:**

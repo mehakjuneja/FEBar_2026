@@ -1,0 +1,48 @@
+# Accord — Databricks Asset Bundle (DAB) root
+# 3-Way Match Invoice Approval for Maison Lumière (synthetic fragrance retailer).
+# Skeleton: fill workspace hosts + flesh out resources as each phase is built.
+# Skills: databricks-core + databricks-dabs. Never auto-select a profile; deploy with --profile.
+
+bundle:
+  name: accord
+
+# Per-module resource definitions are added under each module's resources/ folder as phases land.
+include:
+  - foundation/resources/*.yml
+  - pipeline/resources/*.yml
+  - ml/resources/*.yml
+  - app/resources/*.yml
+  - dashboard/resources/*.yml
+  - agents/resources/*.yml
+
+# Bundle variables — notebooks/resources read these; NO hardcoded catalog/host literals.
+variables:
+  catalog:
+    description: Unity Catalog for this target.
+    default: febar_accord_dev
+  schema_suffix:
+    description: Schema suffix (e.g. _dev in dev, empty in prod).
+    default: _dev
+
+targets:
+  dev:
+    mode: development
+    default: true
+    # workspace:
+    #   host: https://<your-dev-workspace>.cloud.databricks.com
+    variables:
+      catalog: febar_accord_dev
+      schema_suffix: _dev
+
+  prod:
+    mode: production
+    # workspace:
+    #   host: https://<your-prod-workspace>.cloud.databricks.com
+    variables:
+      catalog: febar_accord
+      schema_suffix: ""
+
+# Usage (operator supplies --profile; never auto-selected):
+#   databricks bundle validate -t dev --profile <name>
+#   databricks bundle deploy   -t dev --profile <name>
+#   databricks bundle run <resource> -t dev --profile <name>

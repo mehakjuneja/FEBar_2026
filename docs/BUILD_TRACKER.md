@@ -15,7 +15,7 @@ endpoint responds, Genie answers correctly, app renders + writes an audit row).
 (catalog `accord_febar_catalog`). F1 UC setup; F2 generated 25 vendors / 300 SKUs / 11.7k PO /
 11.2k GR / 12.3k invoice lines with ground-truth mix (MATCH_OK 71.5%, rest across the taxonomy);
 F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB job
-`foundation_build`. **Next: Phase 1 (P1 ingestion).**
+`foundation_build`. **P1 done** (bronze SDP ingests po/gr/invoice via `STREAM read_files`, counts match feeds). **Next: P2 (silver conform).**
 
 ---
 
@@ -45,7 +45,7 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| P1 | Raw ingestion → bronze (`read_files`/Auto Loader) | ⬜ | bronze row counts = feed counts | streaming tables |
+| P1 | Raw ingestion → bronze (`read_files`/Auto Loader) | ✅ | bronze po/gr/invoice = 11716/11205/12318 (match feeds) | serverless SDP `accord_pipeline` |
 | P2 | Bronze → silver conform (+ vendor_master, match_config) | ⬜ | typed/deduped counts; normalization | |
 | P3 | Silver → gold **3-way match** + features (`invoice_match_result`) | ⬜ | disposition mix matches seeded truth | the heart of the build |
 

@@ -10,7 +10,7 @@ bundle:
 # Uncomment each include as that module's first resource yml is created (keeps `validate` green).
 include:
   - foundation/resources/*.yml
-  # - pipeline/resources/*.yml
+  - pipeline/resources/*.yml
   # - ml/resources/*.yml
   # - app/resources/*.yml
   # - dashboard/resources/*.yml

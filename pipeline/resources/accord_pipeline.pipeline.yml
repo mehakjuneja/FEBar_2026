@@ -1,0 +1,17 @@
+# Accord 3-way match pipeline (Phase 1). Serverless Lakeflow SDP.
+# P1 bronze now; silver (P2) and gold (P3) datasets are added to the same pipeline next.
+resources:
+  pipelines:
+    accord_pipeline:
+      name: "[accord] 3-way match pipeline"
+      catalog: ${var.catalog}
+      schema: "bronze${var.schema_suffix}"     # default publish target; silver/gold use fully-qualified names
+      serverless: true
+      photon: true
+      configuration:
+        # Portable feeds root — referenced as ${feeds_root} inside the SQL.
+        feeds_root: /Volumes/${var.catalog}/landing${var.schema_suffix}/feeds
+      libraries:
+        - glob:
+            include: ../src/**/*.sql
+        # add a ../src/**/*.py glob here when P2/P3 introduce Python transforms

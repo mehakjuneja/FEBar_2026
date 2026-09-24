@@ -32,10 +32,19 @@ print(f"Schemas       : {[s + SUFFIX for s in SCHEMAS]}")
 
 # COMMAND ----------
 # MAGIC %md ## 1. Catalog + medallion schemas
-# MAGIC `CREATE CATALOG` is a no-op if it already exists (FEVM provisions `accord_febar_catalog`).
+# MAGIC On a shared FEVM metastore you don't have `CREATE CATALOG` and the catalog is pre-provisioned,
+# MAGIC so we *try* to create it but tolerate `PERMISSION_DENIED` — you own the schemas within it.
 
 # COMMAND ----------
-spark.sql(f"CREATE CATALOG IF NOT EXISTS {CATALOG}")
+try:
+    spark.sql(f"CREATE CATALOG IF NOT EXISTS {CATALOG}")
+    print(f"  ✓ catalog {CATALOG} (created or already present)")
+except Exception as e:
+    if "PERMISSION_DENIED" in str(e) or "CREATE CATALOG" in str(e):
+        print(f"  ℹ catalog {CATALOG} is pre-provisioned (no CREATE CATALOG on this metastore) — using it.")
+    else:
+        raise
+
 for s in SCHEMAS:
     spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.{s}{SUFFIX}")
     print(f"  ✓ schema {CATALOG}.{s}{SUFFIX}")

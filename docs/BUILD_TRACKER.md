@@ -11,9 +11,11 @@ when an object lands: flip its status here (and check the box in its phase plan)
 **Verified means:** it ran, and I checked the output against an explicit expectation (row counts,
 endpoint responds, Genie answers correctly, app renders + writes an audit row).
 
-**Last updated:** 2026-09-24 — scaffold + plans created; **F1 built & verified** in the FEVM
-`accord-febar` workspace (catalog `accord_febar_catalog`; schemas landing/bronze/silver/gold/ml;
-volume `landing.feeds` with po/gr/invoice). Next: F2.
+**Last updated:** 2026-09-24 — **Phase 0 COMPLETE & verified** in the FEVM `accord-febar` workspace
+(catalog `accord_febar_catalog`). F1 UC setup; F2 generated 25 vendors / 300 SKUs / 11.7k PO /
+11.2k GR / 12.3k invoice lines with ground-truth mix (MATCH_OK 71.5%, rest across the taxonomy);
+F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB job
+`foundation_build`. **Next: Phase 1 (P1 ingestion).**
 
 ---
 
@@ -36,8 +38,8 @@ volume `landing.feeds` with po/gr/invoice). Next: F2.
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
 | F1 | UC setup (catalog/schemas/volume/grants) | ✅ | schemas + volume + feed folders verified | `foundation/src/00_uc_setup.py` |
-| F2 | Synthetic PO/GR/Invoice generator (+ seeded labeled discrepancies) | ⬜ | row counts + disposition mix | ground truth for ML |
-| F3 | Landing feeds written to volume | ⬜ | files present under `/feeds/{po,gr,invoice}` | CSV/JSON |
+| F2 | Synthetic PO/GR/Invoice generator (+ seeded labeled discrepancies) | ✅ | 25 vendors, 12.3k invoice lines, MATCH_OK 71.5% | ground truth for ML |
+| F3 | Landing feeds written to volume | ✅ | 18–19 monthly partitions per feed | CSV po/gr, JSON invoice |
 
 ## Phase 1 — Lakeflow pipeline *(hard gate)*
 

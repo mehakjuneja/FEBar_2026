@@ -1,0 +1,31 @@
+# Foundation build job (Phase 0) — runs F1 -> F2 -> F3 on serverless.
+# F3 task is added once 20_write_feeds.py exists.
+resources:
+  jobs:
+    foundation_build:
+      name: "[accord] Foundation build (F1-F3)"
+      tasks:
+        - task_key: f1_uc_setup
+          notebook_task:
+            notebook_path: ../src/00_uc_setup.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_suffix: ${var.schema_suffix}
+
+        - task_key: f2_generate_documents
+          depends_on:
+            - task_key: f1_uc_setup
+          notebook_task:
+            notebook_path: ../src/10_generate_documents.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_suffix: ${var.schema_suffix}
+
+        - task_key: f3_write_feeds
+          depends_on:
+            - task_key: f2_generate_documents
+          notebook_task:
+            notebook_path: ../src/20_write_feeds.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_suffix: ${var.schema_suffix}

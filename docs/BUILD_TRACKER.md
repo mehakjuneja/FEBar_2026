@@ -15,7 +15,7 @@ endpoint responds, Genie answers correctly, app renders + writes an audit row).
 (catalog `accord_febar_catalog`). F1 UC setup; F2 generated 25 vendors / 300 SKUs / 11.7k PO /
 11.2k GR / 12.3k invoice lines with ground-truth mix (MATCH_OK 71.5%, rest across the taxonomy);
 F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB job
-`foundation_build`. **P1+P2 done** (bronze ingest + silver conform/normalize + governed match_config; counts verified). **Next: P3 (gold 3-way match).**
+`foundation_build`. **Phase 1 COMPLETE (hard gate #1 met)** — bronze ingest + silver conform + gold 3-way match; gold matches ground truth 99.76%/99.78%. **Next: Phase 2 (M1 features).**
 
 ---
 
@@ -23,7 +23,7 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 
 | Gate | Object(s) | Status |
 |---|---|---|
-| Lakeflow pipeline (SDP raw→silver→gold) | P1, P2, P3 | ⬜ |
+| Lakeflow pipeline (SDP raw→silver→gold) | P1, P2, P3 | ✅ |
 | Real ML model behind a serving endpoint | M2, M3 | ⬜ |
 | Genie agent over governed tables | G1 | ⬜ |
 | One integrated end-to-end journey | F→P→M→G→A | ⬜ |
@@ -47,7 +47,7 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 |---|---|---|---|---|
 | P1 | Raw ingestion → bronze (`read_files`/Auto Loader) | ✅ | bronze po/gr/invoice = 11716/11205/12318 (match feeds) | serverless SDP `accord_pipeline` |
 | P2 | Bronze → silver conform (+ vendor_master, match_config) | ✅ | silver po/gr/inv 11716/11205/12318, vendors 25, types+norm | MVs + editable match_config |
-| P3 | Silver → gold **3-way match** + features (`invoice_match_result`) | ⬜ | disposition mix matches seeded truth | the heart of the build |
+| P3 | Silver → gold **3-way match** + features (`invoice_match_result`) | ✅ | 99.76% reason / 99.78% disposition accuracy vs line_truth | the heart of the build |
 
 ## Phase 2 — ML model *(hard gate)*
 

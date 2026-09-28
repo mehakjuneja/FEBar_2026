@@ -7,7 +7,7 @@ when an object lands: flip its status here (and check the box in its phase plan)
 > 1. **Build objects** (F/P/M/G/A/D/X/R) — what I actually work on, phase by phase.
 > 2. **FE Bar coverage** — the hard gates and the four scored domains the objects satisfy.
 
-**Status legend:** ✅ Built & verified · 🟡 In progress / partial · ⬜ Planned only
+**Status legend:** ✅ Verified by Mehak · 🔨 Built & Claude-tested — **awaiting Mehak's verification** · 🟡 In progress · ⬜ Planned only
 **Verified means:** it ran, and I checked the output against an explicit expectation (row counts,
 endpoint responds, Genie answers correctly, app renders + writes an audit row).
 
@@ -15,7 +15,7 @@ endpoint responds, Genie answers correctly, app renders + writes an audit row).
 (catalog `accord_febar_catalog`). F1 UC setup; F2 generated 25 vendors / 300 SKUs / 11.7k PO /
 11.2k GR / 12.3k invoice lines with ground-truth mix (MATCH_OK 71.5%, rest across the taxonomy);
 F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB job
-`foundation_build`. **Phase 2 COMPLETE (hard gate #2 met)** — GBT Approve/Hold model (UC v1 @champion) behind serving endpoint `accord-holdrecommender`; batch `ml.invoice_scored` powers queue ranking. **Next: Phase 3 (Genie).**
+`foundation_build`. **Phases 0-3 BUILT & Claude-tested — AWAITING MEHAK'S VERIFICATION (🔨).** All 3 hard gates built: Lakeflow pipeline, ML model+serving, and Genie (space "Accord — AP 3-Way Match", 01f1bb76d5751e2b8; benchmark answers exact). **Mehak to verify; then Phase 4 (app).**
 
 ---
 
@@ -23,9 +23,9 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 
 | Gate | Object(s) | Status |
 |---|---|---|
-| Lakeflow pipeline (SDP raw→silver→gold) | P1, P2, P3 | ✅ |
-| Real ML model behind a serving endpoint | M2, M3 | ✅ |
-| Genie agent over governed tables | G1 | ⬜ |
+| Lakeflow pipeline (SDP raw→silver→gold) | P1, P2, P3 | 🔨 |
+| Real ML model behind a serving endpoint | M2, M3 | 🔨 |
+| Genie agent over governed tables | G1 | 🔨 |
 | One integrated end-to-end journey | F→P→M→G→A | ⬜ |
 | Customer-safe (synthetic, no secrets) | F2, all | ⬜ |
 | Own work / attestation / defensible | all | ⬜ |
@@ -37,32 +37,32 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| F1 | UC setup (catalog/schemas/volume/grants) | ✅ | schemas + volume + feed folders verified | `foundation/src/00_uc_setup.py` |
-| F2 | Synthetic PO/GR/Invoice generator (+ seeded labeled discrepancies) | ✅ | 25 vendors, 12.3k invoice lines, MATCH_OK 71.5% | ground truth for ML |
-| F3 | Landing feeds written to volume | ✅ | 18–19 monthly partitions per feed | CSV po/gr, JSON invoice |
+| F1 | UC setup (catalog/schemas/volume/grants) | 🔨 | schemas + volume + feed folders verified | `foundation/src/00_uc_setup.py` |
+| F2 | Synthetic PO/GR/Invoice generator (+ seeded labeled discrepancies) | 🔨 | 25 vendors, 12.3k invoice lines, MATCH_OK 71.5% | ground truth for ML |
+| F3 | Landing feeds written to volume | 🔨 | 18–19 monthly partitions per feed | CSV po/gr, JSON invoice |
 
 ## Phase 1 — Lakeflow pipeline *(hard gate)*
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| P1 | Raw ingestion → bronze (`read_files`/Auto Loader) | ✅ | bronze po/gr/invoice = 11716/11205/12318 (match feeds) | serverless SDP `accord_pipeline` |
-| P2 | Bronze → silver conform (+ vendor_master, match_config) | ✅ | silver po/gr/inv 11716/11205/12318, vendors 25, types+norm | MVs + editable match_config |
-| P3 | Silver → gold **3-way match** + features (`invoice_match_result`) | ✅ | 99.76% reason / 99.78% disposition accuracy vs line_truth | the heart of the build |
+| P1 | Raw ingestion → bronze (`read_files`/Auto Loader) | 🔨 | bronze po/gr/invoice = 11716/11205/12318 (match feeds) | serverless SDP `accord_pipeline` |
+| P2 | Bronze → silver conform (+ vendor_master, match_config) | 🔨 | silver po/gr/inv 11716/11205/12318, vendors 25, types+norm | MVs + editable match_config |
+| P3 | Silver → gold **3-way match** + features (`invoice_match_result`) | 🔨 | 99.76% reason / 99.78% disposition accuracy vs line_truth | the heart of the build |
 
 ## Phase 2 — ML model *(hard gate)*
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| M1 | Feature engineering + label view | ✅ | 12318 rows, 28.5% holds, leakage-guarded (12 features) | ml.features_labeled |
-| M2 | Train Approve/Hold model + MLflow tracking | ✅ | AUC 1.0, hold recall@0.35 0.997 vs 0.715 baseline | GBT, UC model v1 @champion |
-| M3 | Register UC model + serving endpoint | ✅ | endpoint accord-holdrecommender READY, scores test rows (0/1) | hard gate |
-| M4 | Inference wiring (batch → gold + realtime contract) | ✅ | ml.invoice_scored hold_probability; queue ranking verified | batch proba + realtime endpoint |
+| M1 | Feature engineering + label view | 🔨 | 12318 rows, 28.5% holds, leakage-guarded (12 features) | ml.features_labeled |
+| M2 | Train Approve/Hold model + MLflow tracking | 🔨 | AUC 1.0, hold recall@0.35 0.997 vs 0.715 baseline | GBT, UC model v1 @champion |
+| M3 | Register UC model + serving endpoint | 🔨 | endpoint accord-holdrecommender READY, scores test rows (0/1) | hard gate |
+| M4 | Inference wiring (batch → gold + realtime contract) | 🔨 | ml.invoice_scored hold_probability; queue ranking verified | batch proba + realtime endpoint |
 
 ## Phase 3 — Genie *(hard gate)*
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| G1 | Genie space over gold + curated sample Q&A | ⬜ | 5 sample Qs return correct SQL-backed answers | not the app chatbot |
+| G1 | Genie space over gold + curated sample Q&A | 🔨 | space 01f1bb76d5751e2b8; Q1 holds=1003 ✓, auto/hold 8805/3513 ✓ | "Accord — AP 3-Way Match" |
 
 ## Phase 4 — Invoice Reconciliation Workbench (app)
 

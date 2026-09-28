@@ -15,7 +15,7 @@ endpoint responds, Genie answers correctly, app renders + writes an audit row).
 (catalog `accord_febar_catalog`). F1 UC setup; F2 generated 25 vendors / 300 SKUs / 11.7k PO /
 11.2k GR / 12.3k invoice lines with ground-truth mix (MATCH_OK 71.5%, rest across the taxonomy);
 F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB job
-`foundation_build`. **Phase 1 COMPLETE (hard gate #1 met)** — bronze ingest + silver conform + gold 3-way match; gold matches ground truth 99.76%/99.78%. **Next: Phase 2 (M1 features).**
+`foundation_build`. **Phase 2 COMPLETE (hard gate #2 met)** — GBT Approve/Hold model (UC v1 @champion) behind serving endpoint `accord-holdrecommender`; batch `ml.invoice_scored` powers queue ranking. **Next: Phase 3 (Genie).**
 
 ---
 
@@ -24,7 +24,7 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 | Gate | Object(s) | Status |
 |---|---|---|
 | Lakeflow pipeline (SDP raw→silver→gold) | P1, P2, P3 | ✅ |
-| Real ML model behind a serving endpoint | M2, M3 | ⬜ |
+| Real ML model behind a serving endpoint | M2, M3 | ✅ |
 | Genie agent over governed tables | G1 | ⬜ |
 | One integrated end-to-end journey | F→P→M→G→A | ⬜ |
 | Customer-safe (synthetic, no secrets) | F2, all | ⬜ |
@@ -53,10 +53,10 @@ F3 wrote monthly CSV/JSON feeds to the `landing.feeds` volume. Deployed via DAB 
 
 | ID | Object | Status | Verify | Notes |
 |---|---|---|---|---|
-| M1 | Feature engineering + label view | ⬜ | feature table row count; label balance | |
-| M2 | Train Approve/Hold model + MLflow tracking | ⬜ | logged run; metrics beat baseline | GBT baseline |
-| M3 | Register UC model + serving endpoint | ⬜ | endpoint READY; scores a test row | hard gate |
-| M4 | Inference wiring (batch → gold + realtime contract) | ⬜ | gold has scores; app contract doc | |
+| M1 | Feature engineering + label view | ✅ | 12318 rows, 28.5% holds, leakage-guarded (12 features) | ml.features_labeled |
+| M2 | Train Approve/Hold model + MLflow tracking | ✅ | AUC 1.0, hold recall@0.35 0.997 vs 0.715 baseline | GBT, UC model v1 @champion |
+| M3 | Register UC model + serving endpoint | ✅ | endpoint accord-holdrecommender READY, scores test rows (0/1) | hard gate |
+| M4 | Inference wiring (batch → gold + realtime contract) | ✅ | ml.invoice_scored hold_probability; queue ranking verified | batch proba + realtime endpoint |
 
 ## Phase 3 — Genie *(hard gate)*
 

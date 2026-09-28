@@ -1,0 +1,21 @@
+# ML training job (Phase 2, M1+M2). Serverless. Builds features + trains + registers to UC.
+resources:
+  jobs:
+    ml_train:
+      name: "[accord] ML train hold recommender (M1+M2)"
+      tasks:
+        - task_key: train_holdrecommender
+          notebook_task:
+            notebook_path: ../src/train_holdrecommender.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_suffix: ${var.schema_suffix}
+
+        - task_key: batch_score
+          depends_on:
+            - task_key: train_holdrecommender
+          notebook_task:
+            notebook_path: ../src/M4_batch_score.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema_suffix: ${var.schema_suffix}

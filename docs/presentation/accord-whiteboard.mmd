@@ -1,0 +1,42 @@
+flowchart LR
+  classDef pain fill:#ff5f46,stroke:#1b3139,color:#ffffff,stroke-width:2px;
+  classDef ink fill:#ffffff,stroke:#1b3139,color:#1b3139,stroke-width:1.5px;
+  classDef match fill:#ff5f46,stroke:#1b3139,color:#ffffff,stroke-width:3px;
+  classDef ai fill:#4359ff,stroke:#1b3139,color:#ffffff,stroke-width:2px;
+  classDef value fill:#00a972,stroke:#1b3139,color:#ffffff,stroke-width:2px;
+  classDef gov fill:#2272b4,stroke:#1b3139,color:#ffffff,stroke-width:2px;
+
+  PAIN["AP analyst — Maison Lumiere<br/>~10k invoice lines / month<br/>Which do we pay? Where is the leak?"]:::pain
+
+  subgraph SRC["3 docs that must agree"]
+    PO["Purchase Order"]:::ink
+    GR["Goods Receipt"]:::ink
+    INV["Invoice"]:::ink
+  end
+
+  subgraph PIPE["Lakeflow pipeline — self-built, serverless"]
+    BRONZE["BRONZE<br/>raw ingest · Auto Loader"]:::ink
+    SILVER["SILVER<br/>conform · + match_config"]:::ink
+    GOLD["GOLD — 3-WAY MATCH<br/>disposition / reason_code / amt_at_risk"]:::match
+  end
+
+  ML["ML Hold recommender<br/>+ Serving endpoint"]:::ai
+  GENIE["Genie<br/>ask the data in English"]:::ai
+  APP["Invoice Reconciliation Workbench<br/>Summary · Review bulk-approve · Exceptions"]:::ink
+
+  PAYOFF["Auto-approve clean lines<br/>Bulk-clear safe holds<br/>Analysts focus on real exceptions<br/>Faster close · less leakage · clean audit"]:::value
+
+  GOV["Unity Catalog governance + Lakeflow — one catalog: accord_febar_catalog landing to bronze to silver to gold to ml"]:::gov
+
+  PAIN --> PO
+  PO --> BRONZE
+  GR --> BRONZE
+  INV --> BRONZE
+  BRONZE --> SILVER --> GOLD
+  GOLD --> ML
+  GOLD --> GENIE
+  ML --> APP
+  GOLD --> APP
+  APP --> PAYOFF
+  GENIE --> PAYOFF
+  GOV -.foundation.- PIPE
